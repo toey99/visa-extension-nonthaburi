@@ -120,15 +120,15 @@ export default function Page() {
     setForm((prev) => ({
       ...prev,
       title: data.title || prev.title,
-      firstName: data.firstName || prev.firstName,
-      lastName: data.lastName || prev.lastName,
-      nationality: data.nationality || prev.nationality,
-      passportNo: data.passportNo || prev.passportNo,
+      firstName: upper(data.firstName) || prev.firstName,
+      lastName: upper(data.lastName) || prev.lastName,
+      nationality: upper(data.nationality) || prev.nationality,
+      passportNo: upper(data.passportNo) || prev.passportNo,
       dateOfBirth: data.dateOfBirth || prev.dateOfBirth,
-      placeOfBirth: data.placeOfBirth || prev.placeOfBirth,
+      placeOfBirth: upper(data.placeOfBirth) || prev.placeOfBirth,
       passportIssueDate: data.passportIssueDate || prev.passportIssueDate,
       passportExpiryDate: data.passportExpiryDate || prev.passportExpiryDate,
-      passportIssuedAt: data.passportIssuedAt || prev.passportIssuedAt,
+      passportIssuedAt: upper(data.passportIssuedAt) || prev.passportIssuedAt,
     }));
 
     setError("");
@@ -155,11 +155,11 @@ export default function Page() {
 
     setForm((prev) => ({
       ...prev,
-      houseNo: data.houseNo || prev.houseNo,
-      road: data.road || prev.road,
-      subDistrict: data.subDistrict || prev.subDistrict,
-      district: data.district || prev.district,
-      province: data.province || prev.province,
+      houseNo: upper(data.houseNo) || prev.houseNo,
+      road: upper(data.road) || prev.road,
+      subDistrict: upper(data.subDistrict) || prev.subDistrict,
+      district: upper(data.district) || prev.district,
+      province: upper(data.province) || prev.province,
       postalCode: data.postalCode || prev.postalCode,
     }));
 
@@ -361,9 +361,10 @@ export default function Page() {
               type="text"
               required
               value={form.firstName}
-              onChange={(e) => set("firstName", e.target.value)}
+              onChange={(e) => set("firstName", e.target.value.toUpperCase())}
               placeholder="JOHN"
-              className={inputCls}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Last Name" thai="นามสกุล" required>
@@ -371,9 +372,10 @@ export default function Page() {
               type="text"
               required
               value={form.lastName}
-              onChange={(e) => set("lastName", e.target.value)}
+              onChange={(e) => set("lastName", e.target.value.toUpperCase())}
               placeholder="DOE"
-              className={inputCls}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Nationality" thai="สัญชาติ" required>
@@ -381,9 +383,10 @@ export default function Page() {
               type="text"
               required
               value={form.nationality}
-              onChange={(e) => set("nationality", e.target.value)}
+              onChange={(e) => set("nationality", e.target.value.toUpperCase())}
               placeholder="BRITISH"
-              className={inputCls}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Date of Birth" thai="วันเกิด">
@@ -396,9 +399,10 @@ export default function Page() {
             <input
               type="text"
               value={form.placeOfBirth}
-              onChange={(e) => set("placeOfBirth", e.target.value)}
+              onChange={(e) => set("placeOfBirth", e.target.value.toUpperCase())}
               placeholder="LONDON"
-              className={inputCls}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
         </Section>
@@ -411,16 +415,18 @@ export default function Page() {
               value={form.passportNo}
               onChange={(e) => set("passportNo", e.target.value.toUpperCase())}
               placeholder="AB1234567"
-              className={inputCls}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Issued At (country)" thai="ออกให้ที่ (ประเทศ)">
             <input
               type="text"
               value={form.passportIssuedAt}
-              onChange={(e) => set("passportIssuedAt", e.target.value)}
+              onChange={(e) => set("passportIssuedAt", e.target.value.toUpperCase())}
               placeholder="UNITED KINGDOM"
-              className={inputCls}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Date of Issue" thai="วันที่ออก">
@@ -449,33 +455,37 @@ export default function Page() {
             <input
               type="text"
               value={form.fromCountry}
-              onChange={(e) => set("fromCountry", e.target.value)}
+              onChange={(e) => set("fromCountry", e.target.value.toUpperCase())}
               placeholder="UNITED KINGDOM"
-              className={inputCls}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Port of Arrival" thai="ด่านที่เดินทางเข้า">
             <input
               type="text"
               value={form.portOfArrival}
-              onChange={(e) => set("portOfArrival", e.target.value)}
-              className={inputCls}
+              onChange={(e) => set("portOfArrival", e.target.value.toUpperCase())}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Arrived By" thai="เดินทางโดย">
             <input
               type="text"
               value={form.arrivedBy}
-              onChange={(e) => set("arrivedBy", e.target.value)}
-              className={inputCls}
+              onChange={(e) => set("arrivedBy", e.target.value.toUpperCase())}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Type of Visa" thai="ประเภทวีซ่า" full>
             <input
               type="text"
               value={form.visaType}
-              onChange={(e) => set("visaType", e.target.value)}
-              className={inputCls}
+              onChange={(e) => set("visaType", e.target.value.toUpperCase())}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
         </Section>
@@ -485,40 +495,45 @@ export default function Page() {
             <input
               type="text"
               value={form.houseNo}
-              onChange={(e) => set("houseNo", e.target.value)}
-              className={inputCls}
+              onChange={(e) => set("houseNo", e.target.value.toUpperCase())}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Road / Street" thai="ถนน">
             <input
               type="text"
               value={form.road}
-              onChange={(e) => set("road", e.target.value)}
-              className={inputCls}
+              onChange={(e) => set("road", e.target.value.toUpperCase())}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Sub-District (Tambol)" thai="ตำบล / แขวง">
             <input
               type="text"
               value={form.subDistrict}
-              onChange={(e) => set("subDistrict", e.target.value)}
-              className={inputCls}
+              onChange={(e) => set("subDistrict", e.target.value.toUpperCase())}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="District (Amphur)" thai="อำเภอ / เขต">
             <input
               type="text"
               value={form.district}
-              onChange={(e) => set("district", e.target.value)}
-              className={inputCls}
+              onChange={(e) => set("district", e.target.value.toUpperCase())}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Province" thai="จังหวัด">
             <input
               type="text"
               value={form.province}
-              onChange={(e) => set("province", e.target.value)}
-              className={inputCls}
+              onChange={(e) => set("province", e.target.value.toUpperCase())}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
           <Field label="Postal Code" thai="รหัสไปรษณีย์">
@@ -576,8 +591,9 @@ export default function Page() {
             <input
               type="text"
               value={form.extensionReason}
-              onChange={(e) => set("extensionReason", e.target.value)}
-              className={inputCls}
+              onChange={(e) => set("extensionReason", e.target.value.toUpperCase())}
+              autoCapitalize="characters"
+              className={upperInputCls}
             />
           </Field>
         </Section>
@@ -668,8 +684,15 @@ export default function Page() {
 const inputBase =
   "w-full rounded-lg border px-3.5 py-2.5 text-sm transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none";
 const inputCls = `${inputBase} border-slate-300 bg-white`;
+// Free-text fields printed on the form: shown AND stored in uppercase.
+const upperInputCls = `${inputCls} uppercase`;
 // Yellow highlight for fields that always require manual entry (no AI/passport auto-fill).
 const inputHighlightCls = `${inputBase} border-yellow-400 bg-yellow-100 font-semibold text-yellow-900 placeholder:font-normal placeholder:text-yellow-700/60`;
+
+// Uppercase optional scanner output (undefined/empty stays falsy).
+function upper(v: string | undefined | null): string {
+  return (v ?? "").toUpperCase();
+}
 
 // Auto-format raw digits as DD/MM/YYYY while typing (e.g. "01122024" → "01/12/2024")
 function formatDateMask(raw: string): string {

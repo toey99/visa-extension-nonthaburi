@@ -14,6 +14,7 @@ import fs from "fs";
 import path from "path";
 import { passportDateFields } from "./tm7-passport-dates.ts";
 import { officeFormLocation, type OfficeId } from "./offices.ts";
+import { uppercaseTm7Data } from "./tm7-normalize.ts";
 import {
   PAGE3_INDEX,
   PAGE3_LINE_THICKNESS,
@@ -152,9 +153,11 @@ function calcAge(dob: Date | null): string {
 }
 
 export async function generateTm7PdfNonthaburi(
-  data: Tm7FormData,
+  input: Tm7FormData,
   tm30Pdf?: Uint8Array,
 ): Promise<Uint8Array> {
+  // Safety net: every free-text field is uppercased before drawing.
+  const data = uppercaseTm7Data(input);
   const templateBytes = await loadTemplate();
   const pdfDoc = await PDFDocument.load(templateBytes);
   const templatePages = pdfDoc.getPageCount();
