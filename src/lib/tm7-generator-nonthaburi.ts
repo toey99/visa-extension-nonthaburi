@@ -107,6 +107,8 @@ const TEMPLATE_PAGES = 3;
 
 async function loadTemplate(): Promise<Uint8Array> {
   const p = TEMPLATE_PATH;
+  // No fallback template: a missing file must fail loudly.
+  if (!fs.existsSync(p)) throw new Error(`TM7 template not found: ${p}`);
   // Cache-bust on the file's mtime: re-read whenever the template changes
   // on disk so an updated template is picked up without restarting the server.
   const mtimeMs = fs.statSync(p).mtimeMs;
