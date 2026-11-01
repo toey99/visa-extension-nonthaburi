@@ -63,6 +63,40 @@ const INITIAL: FormState = {
   extensionReason: "TOURISM",
 };
 
+// Dev-only sample data: each value names its own field so it is obvious
+// in the generated PDF which value landed in which box. Dates are distinct
+// so each one is recognisable too (page 3's "Date" = appointmentDate).
+const SAMPLE: FormState = {
+  title: "MR.",
+  firstName: "FIRSTNAME",
+  lastName: "LASTNAME",
+  nationality: "NATIONALITY",
+  dateOfBirth: "01/02/1980",
+  placeOfBirth: "BIRTHPLACE-XXX",
+  passportNo: "PASSPORTNO123",
+  passportIssueDate: "03/04/2021",
+  passportExpiryDate: "05/06/2031",
+  passportIssuedAt: "ISSUEDAT-XXX",
+  arrivalDate: "07/08/2026",
+  fromCountry: "FROMCOUNTRY-XXX",
+  portOfArrival: "PORT-XXX",
+  arrivedBy: "ARRIVEDBY-XXX",
+  visaType: "VISATYPE-XXX",
+  houseNo: "HOUSENO-1",
+  road: "ROAD-XXX",
+  subDistrict: "SUBDISTRICT-XXX",
+  district: "DISTRICT-XXX",
+  province: "PROVINCE-XXX",
+  postalCode: "99999",
+  phone: "PHONE-0812345678",
+  appointmentDate: "09/10/2026",
+  formLocation: "LOCATION-XXX",
+  extensionDays: "45",
+  extensionReason: "REASON-TOURISM",
+};
+
+const IS_DEV = process.env.NODE_ENV !== "production";
+
 export default function Page() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [submitting, setSubmitting] = useState(false);
@@ -172,6 +206,10 @@ export default function Page() {
 
     setSubmitting(true);
 
+    // Open the tab synchronously (still inside the click) so popup
+    // blockers allow it; it is pointed at the PDF once generated.
+    const pdfTab = window.open("", "_blank");
+
     if (pdfUrl) {
       URL.revokeObjectURL(pdfUrl);
       setPdfUrl("");
@@ -224,11 +262,13 @@ export default function Page() {
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       setPdfUrl(url);
+      if (pdfTab) pdfTab.location.href = url;
 
       setTimeout(() => {
         previewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     } catch (err) {
+      pdfTab?.close();
       setError(err instanceof Error ? err.message : "Failed to generate PDF");
     } finally {
       setSubmitting(false);
@@ -271,7 +311,7 @@ export default function Page() {
           TM.7 Visa Extension Form
         </h1>
         <p className="mt-2 text-sm text-slate-600">
-          Fill in your details below and generate a printable TM.7 packet (5 pages: TM.7, STM.2, STM.9, STM.11).
+          Fill in your details below and generate a printable TM.7 packet (3 pages: TM.7, STM.2).
         </p>
       </header>
 
@@ -542,6 +582,18 @@ export default function Page() {
         )}
 
         <div className="flex items-center justify-end gap-3">
+          {IS_DEV && (
+            <button
+              type="button"
+              onClick={() => {
+                setForm(SAMPLE);
+                setError("");
+              }}
+              className="mr-auto rounded-lg border border-dashed border-amber-400 bg-amber-50 px-5 py-2.5 text-sm font-medium text-amber-800 transition-colors hover:bg-amber-100"
+            >
+              Fill sample data (dev)
+            </button>
+          )}
           <button
             type="button"
             onClick={handleReset}
@@ -574,8 +626,8 @@ export default function Page() {
               <h2 className="text-xl font-semibold text-slate-900">Preview</h2>
               <p className="text-sm text-slate-500">
                 {tm30File
-                  ? "6 pages: TM.7, STM.2, STM.9, STM.11, TM.30"
-                  : "5 pages: TM.7, STM.2, STM.9, STM.11"}
+                  ? "3 pages + TM.30: TM.7, STM.2, TM.30"
+                  : "3 pages: TM.7, STM.2"}
               </p>
             </div>
             <div className="flex gap-2">

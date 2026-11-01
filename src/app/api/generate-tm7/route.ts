@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
       );
     }
     const data = JSON.parse(payloadRaw) as Tm7FormData;
+    console.log(`[TM7 API] formLocation=${JSON.stringify(data.formLocation ?? null)}`);
 
     if (!data?.firstName || !data?.lastName || !data?.passportNo || !data?.nationality || !data?.title) {
       return NextResponse.json(
