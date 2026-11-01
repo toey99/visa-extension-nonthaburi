@@ -10,6 +10,7 @@
 //   node scripts/preview-nonthaburi.mts            # MR. (male base layout)
 //   node scripts/preview-nonthaburi.mts MRS.       # exercise female offsets
 //   node scripts/preview-nonthaburi.mts MISS
+//   node scripts/preview-nonthaburi.mts MR. CHIANG_SAEN   # office (default RAYONG)
 //
 // Edit-and-regenerate loop for fine-tuning X/Y in
 // src/lib/tm7-generator-nonthaburi.ts:
@@ -52,14 +53,14 @@ const dummy: Tm7FormData = {
 
   houseNo: "123/45",
   road: "SUKHUMVIT",
-  subDistrict: "BANG KRASO",
-  district: "MUEANG NONTHABURI",
-  province: "NONTHABURI",
-  postalCode: "11000",
+  subDistrict: "THA PRADU",
+  district: "MUEANG RAYONG",
+  province: "RAYONG",
+  postalCode: "21000",
   phone: "+66 81 234 5678",
 
   appointmentDate: "2026-07-20",
-  formLocation: "NONTHABURI",
+  office: (process.argv[3] === "CHIANG_SAEN" ? "CHIANG_SAEN" : "RAYONG"),
   extensionDays: 30,
   extensionReason: "TOURISM",
 };

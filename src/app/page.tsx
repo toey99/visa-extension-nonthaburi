@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { Tm7FormData, Title } from "@/lib/tm7-generator-nonthaburi";
+import { DEFAULT_OFFICE, OFFICES, OFFICE_IDS, type OfficeId } from "@/lib/offices";
 import AiPassportScanner, { type AiScanResult } from "@/components/AiPassportScanner";
 import AiTm30Scanner, { type AiTm30ScanResult } from "@/components/AiTm30Scanner";
 
@@ -29,7 +30,7 @@ type FormState = {
   postalCode: string;
   phone: string;
   appointmentDate: string;
-  formLocation: string;
+  office: OfficeId;
   extensionDays: string;
   extensionReason: string;
 };
@@ -58,7 +59,7 @@ const INITIAL: FormState = {
   postalCode: "",
   phone: "",
   appointmentDate: "",
-  formLocation: "NONTHABURI",
+  office: DEFAULT_OFFICE,
   extensionDays: "30",
   extensionReason: "TOURISM",
 };
@@ -90,7 +91,7 @@ const SAMPLE: FormState = {
   postalCode: "99999",
   phone: "PHONE-0812345678",
   appointmentDate: "09/10/2026",
-  formLocation: "LOCATION-XXX",
+  office: DEFAULT_OFFICE,
   extensionDays: "45",
   extensionReason: "REASON-TOURISM",
 };
@@ -239,7 +240,7 @@ export default function Page() {
       postalCode: form.postalCode || undefined,
       phone: form.phone || undefined,
       appointmentDate: ddmmyyyyToIso(form.appointmentDate),
-      formLocation: form.formLocation || undefined,
+      office: form.office,
       extensionDays: form.extensionDays ? Number(form.extensionDays) : undefined,
       extensionReason: form.extensionReason || undefined,
     };
@@ -547,13 +548,19 @@ export default function Page() {
               highlight
             />
           </Field>
-          <Field label="Form Location" thai="สถานที่ยื่นคำร้อง">
-            <input
-              type="text"
-              value={form.formLocation}
-              onChange={(e) => set("formLocation", e.target.value)}
+          <Field label="Immigration Office" thai="สถานที่ยื่นคำร้อง" required>
+            <select
+              required
+              value={form.office}
+              onChange={(e) => set("office", e.target.value as OfficeId)}
               className={inputCls}
-            />
+            >
+              {OFFICE_IDS.map((id) => (
+                <option key={id} value={id}>
+                  {OFFICES[id].label} ({OFFICES[id].thai})
+                </option>
+              ))}
+            </select>
           </Field>
           <Field label="Extension Days" thai="จำนวนวันที่ขอต่อ">
             <input

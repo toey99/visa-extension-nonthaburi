@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateTm7PdfNonthaburi, type Tm7FormData } from "@/lib/tm7-generator-nonthaburi";
+import { OFFICE_IDS, isOfficeId, officeFormLocation } from "@/lib/offices";
 
 export const runtime = "nodejs";
 
@@ -15,7 +16,13 @@ export async function POST(req: NextRequest) {
       );
     }
     const data = JSON.parse(payloadRaw) as Tm7FormData;
-    console.log(`[TM7 API] formLocation=${JSON.stringify(data.formLocation ?? null)}`);
+    if (!isOfficeId(data?.office)) {
+      return NextResponse.json(
+        { error: `Unknown office. Choose one of: ${OFFICE_IDS.join(", ")}.` },
+        { status: 400 }
+      );
+    }
+    console.log(`[TM7 API] office=${data.office} formLocation=${officeFormLocation(data.office)}`);
 
     if (!data?.firstName || !data?.lastName || !data?.passportNo || !data?.nationality || !data?.title) {
       return NextResponse.json(

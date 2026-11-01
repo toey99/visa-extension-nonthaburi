@@ -13,6 +13,7 @@ import { PDFDocument, PDFPage, rgb } from "pdf-lib";
 import fs from "fs";
 import path from "path";
 import { passportDateFields } from "./tm7-passport-dates.ts";
+import { officeFormLocation, type OfficeId } from "./offices.ts";
 import {
   PAGE3_INDEX,
   PAGE3_LINE_THICKNESS,
@@ -55,7 +56,7 @@ export type Tm7FormData = {
 
   // Extension
   appointmentDate?: string;      // ISO — used as form date
-  formLocation?: string;         // office location printed on the form, e.g. RAYONG
+  office: OfficeId;              // RAYONG | CHIANG_SAEN — printed location comes from offices.ts
   extensionDays?: number;        // default 30
   extensionReason?: string;      // default TOURISM
 };
@@ -185,7 +186,7 @@ export async function generateTm7PdfNonthaburi(
   const applicantTitle = data.title;
   const titledName = `${applicantTitle} ${lastName} ${firstName}`.replace(/\s+/g, " ").trim();
 
-  const formLocation = (data.formLocation || "").toUpperCase();
+  const formLocation = officeFormLocation(data.office);
   const extensionDays = (data.extensionDays ?? 30).toString();
   const extensionReason = (data.extensionReason || "TOURISM").toUpperCase();
   const portOfArrival = (data.portOfArrival || "").toUpperCase();

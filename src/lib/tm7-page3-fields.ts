@@ -13,6 +13,10 @@
 // that box ends, so text running past it overflows the box.
 //
 // Used by src/lib/tm7-generator-nonthaburi.ts (the production generator)
+//
+// Page 3 has no "สถานที่ยื่นคำร้อง / Location" box (the old 5-page
+// layout had a second one on page 4, STM.9, which no longer exists), so
+// the office location is printed only on page 1.
 // =============================================================
 
 export type Title = "MR." | "MRS." | "MISS";
