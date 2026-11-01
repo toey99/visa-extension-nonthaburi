@@ -224,7 +224,6 @@ export async function generateTm7PdfNonthaburi(
   const district = (data.district || "").trim();
   const province = (data.province || "").trim();
   const postalCode = (data.postalCode || "").trim();
-  const phone = (data.phone || "").trim();
   const provinceZip = postalCode ? `${province} ${postalCode}` : province;
   const fullAddress = `${houseNo} ${road}, ${subDistrict}, ${district}, ${provinceZip}`;
   const lineThickness = 1.5;
@@ -344,9 +343,8 @@ export async function generateTm7PdfNonthaburi(
   drawFieldText(page2, "p2.subDistrict", subDistrict, { x: 440, y: addressLine1Y, size: 12, font, color: C });
   drawFieldText(page2, "p2.district", district, { x: 150, y: addressLine2Y, size: 12, font, color: C });
   drawFieldText(page2, "p2.provinceZip", provinceZip, { x: 365, y: addressLine2Y, size: 12, font, color: C });
-  if (phone) {
-    drawFieldText(page2, "p2.phone", phone, { x: 150, y: addressLine2Y - 40, size: 12, font, color: C });
-  }
+  // Phone is intentionally NOT printed on page 2 (it stays in the form
+  // and in Tm7FormData for other uses).
   drawFieldText(page2, "p2.fullAddress", fullAddress, { x: 175, y: fullAddressY, size: 8, font, color: C });
 
   // ── Page 3: STM.2 (English-only edition) ───────────────────
