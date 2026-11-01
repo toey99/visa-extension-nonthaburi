@@ -3,64 +3,70 @@
 // own month/year, and they were once mapped to each other's slot.
 //
 // Run with: npm test
-process.env.TZ = "Asia/Bangkok";
-
 import assert from "node:assert/strict";
 import test from "node:test";
-import { passportDateFields, type Tm7TextField } from "./tm7-passport-dates.ts";
-
-// Parsed exactly the way the generators parse the ISO payload.
-const parse = (iso: string) => new Date(iso);
+import { passportDateFields, splitIsoDate, type Tm7TextField } from "./tm7-passport-dates.ts";
 
 function byKey(fields: Tm7TextField[]): Record<string, Tm7TextField> {
   return Object.fromEntries(fields.map((f) => [f.key, f]));
 }
 
-test("issue 2024-11-20 and expiry 2034-11-19 keep their own day/month/year", () => {
-  const f = byKey(passportDateFields(parse("2024-11-20"), parse("2034-11-19")));
+const ISSUE_SLOTS = {
+  "p1.issueDay": { x: 480, y: 478 },
+  "p1.issueMonth": { x: 105, y: 436 },
+  "p1.issueYear": { x: 205, y: 436 },
+};
+const EXPIRY_SLOTS = {
+  "p1.expDay": { x: 480, y: 436 },
+  "p1.expMonth": { x: 105, y: 406 },
+  "p1.expYear": { x: 205, y: 406 },
+};
 
-  // Date of issue — 20 NOVEMBER 2024
+function assertSlot(f: Tm7TextField, slot: { x: number; y: number }) {
+  assert.deepEqual({ x: f.x, y: f.y }, slot, `${f.key} drawn at wrong position`);
+}
+
+test("issue 2024-11-20 → 20 / NOVEMBER / 2024 in the issue slots", () => {
+  const f = byKey(passportDateFields("2024-11-20", "2034-11-19"));
   assert.equal(f["p1.issueDay"].value, "20");
   assert.equal(f["p1.issueMonth"].value, "NOVEMBER");
   assert.equal(f["p1.issueYear"].value, "2024");
+  for (const [key, slot] of Object.entries(ISSUE_SLOTS)) assertSlot(f[key], slot);
+});
 
-  // Valid until — 19 NOVEMBER 2034
+test("expiry 2034-11-19 → 19 / NOVEMBER / 2034 in the expiry slots", () => {
+  const f = byKey(passportDateFields("2024-11-20", "2034-11-19"));
   assert.equal(f["p1.expDay"].value, "19");
   assert.equal(f["p1.expMonth"].value, "NOVEMBER");
   assert.equal(f["p1.expYear"].value, "2034");
+  for (const [key, slot] of Object.entries(EXPIRY_SLOTS)) assertSlot(f[key], slot);
 });
 
-test("each day lands in its own slot on the form", () => {
-  const f = byKey(passportDateFields(parse("2024-11-20"), parse("2034-11-19")));
-
-  // Issue day ends the passport-number line (y 478); its month/year are
-  // one line below (y 436) — where the expiry day also lives.
-  assert.deepEqual({ x: f["p1.issueDay"].x, y: f["p1.issueDay"].y }, { x: 480, y: 478 });
-  assert.deepEqual({ x: f["p1.issueMonth"].x, y: f["p1.issueMonth"].y }, { x: 105, y: 436 });
-  assert.deepEqual({ x: f["p1.issueYear"].x, y: f["p1.issueYear"].y }, { x: 205, y: 436 });
-
-  assert.deepEqual({ x: f["p1.expDay"].x, y: f["p1.expDay"].y }, { x: 480, y: 436 });
-  assert.deepEqual({ x: f["p1.expMonth"].x, y: f["p1.expMonth"].y }, { x: 105, y: 406 });
-  assert.deepEqual({ x: f["p1.expYear"].x, y: f["p1.expYear"].y }, { x: 205, y: 406 });
-
-  // No two fields may share a slot.
-  const slots = Object.values(f).map((v) => `${v.x},${v.y}`);
+test("no two fields share a slot", () => {
+  const fields = passportDateFields("2024-11-20", "2034-11-19");
+  assert.equal(fields.length, 6);
+  const slots = fields.map((v) => `${v.x},${v.y}`);
   assert.equal(new Set(slots).size, slots.length);
 });
 
-test("dates with different days are never cross-assigned", () => {
-  // Day-only difference: a swap is invisible in month/year, so assert days.
-  const f = byKey(passportDateFields(parse("2019-01-03"), parse("2029-01-28")));
-  assert.equal(f["p1.issueDay"].value, "3");
-  assert.equal(f["p1.expDay"].value, "28");
+test("single-digit days are zero-padded for both dates", () => {
+  const f = byKey(passportDateFields("2019-01-05", "2029-01-04"));
+  assert.equal(f["p1.issueDay"].value, "05");
+  assert.equal(f["p1.expDay"].value, "04");
 });
 
-test("a missing date contributes no fields", () => {
-  const onlyIssue = passportDateFields(parse("2024-11-20"), null);
-  assert.deepEqual(onlyIssue.map((x) => x.key), ["p1.issueDay", "p1.issueMonth", "p1.issueYear"]);
+test("parsing does not depend on the server timezone", () => {
+  // new Date("2024-11-20") is UTC midnight → getDate() gives 19 west of UTC.
+  // The helper parses the string itself, so any TZ yields the same parts.
+  assert.deepEqual(splitIsoDate("2024-11-20"), { day: "20", month: "NOVEMBER", year: "2024" });
+  assert.deepEqual(splitIsoDate("2024-11-20T00:00:00Z"), { day: "20", month: "NOVEMBER", year: "2024" });
+});
 
-  const onlyExpiry = passportDateFields(null, parse("2034-11-19"));
-  assert.deepEqual(onlyExpiry.map((x) => x.key), ["p1.expDay", "p1.expMonth", "p1.expYear"]);
-
-  assert.deepEqual(passportDateFields(null, null), []);
+test("missing or invalid dates contribute no fields", () => {
+  assert.deepEqual(passportDateFields("2024-11-20", undefined).map((x) => x.key),
+    ["p1.issueDay", "p1.issueMonth", "p1.issueYear"]);
+  assert.deepEqual(passportDateFields(null, "2034-11-19").map((x) => x.key),
+    ["p1.expDay", "p1.expMonth", "p1.expYear"]);
+  assert.deepEqual(passportDateFields("", "20/11/2024"), []);
+  assert.deepEqual(passportDateFields("2024-02-30", "2024-13-01"), []);
 });

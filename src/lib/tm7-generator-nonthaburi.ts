@@ -194,8 +194,6 @@ export async function generateTm7PdfNonthaburi(
     .toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
     .toUpperCase();
 
-  const issueDateObj = parseDate(data.passportIssueDate);
-  const expiryDateObj = parseDate(data.passportExpiryDate);
   const arrivalDateObj = parseDate(data.arrivalDate);
 
   const fmtDay = (d: Date | null) =>
@@ -308,7 +306,7 @@ export async function generateTm7PdfNonthaburi(
 
   // Passport Date of issue / Valid until: geometry + values live in
   // tm7-passport-dates so the two dates cannot be transposed here.
-  for (const f of passportDateFields(issueDateObj, expiryDateObj)) {
+  for (const f of passportDateFields(data.passportIssueDate, data.passportExpiryDate)) {
     drawFieldText(page1, f.key, f.value, { x: f.x, y: f.y, size: 12, font, color: C });
   }
   drawFieldText(page1, "p1.passportIssuedAt", passportIssuedAt, { x: 300, y: 436, size: 12, font, color: C });
