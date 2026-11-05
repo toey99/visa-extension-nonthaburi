@@ -12,7 +12,7 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { analyzeDoc, type AnalyzedDoc } from "@/app/actions/analyzeDoc";
 import { analyzeTm30 } from "@/app/actions/analyzeTm30";
-import type { Tm7FormData } from "@/lib/tm7-generator";
+import type { Tm7FormData } from "@/lib/tm7-generator-nonthaburi";
 import {
   DEFAULT_META, EMPTY_FIELDS, OVERSTAY_FINE_PER_DAY, daysBetween, ddmmyyyyToIso, newId, parseDdmmyyyy,
   personFolderName, todayDdmmyyyy,
